@@ -301,7 +301,7 @@ abstract class TestSuite_Core extends Kohana_Unittest_TestCase
    *
    * @test
    */
-  public function test_protected_methods($method_name)
+  public function test_protected_method($method_name)
   {
     if ($method_name == 'dummy')
       return;
@@ -327,7 +327,7 @@ abstract class TestSuite_Core extends Kohana_Unittest_TestCase
    *
    * @test
    */
-  public function test_public_methods($method_name)
+  public function test_public_method($method_name)
   {
     if ($method_name == 'dummy')
       return;
@@ -353,7 +353,7 @@ abstract class TestSuite_Core extends Kohana_Unittest_TestCase
    *
    * @test
    */
-  public function test_static_methods($method_name)
+  public function test_static_method($method_name)
   {
     if ($method_name == 'dummy')
       return;
