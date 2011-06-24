@@ -1,6 +1,6 @@
 <?php
 /**
- * Declares TestSuite_Core_Model_Sprig
+ * Declares TestSuite_Core_Model_Jelly
  *
  * PHP version 5
  *
@@ -11,14 +11,14 @@
  * @author    mtou <mtou@charougna.com>
  * @copyright 2011 mtou
  * @license   http://www.debian.org/misc/bsd.license BSD License (3 Clause)
- * @link      https://github.com/emtou/kohana-testsuite/tree/master/classes/testsuite/core/model/sprig.php
+ * @link      https://github.com/emtou/kohana-testsuite/tree/master/classes/testsuite/core/model/jelly.php
  * @since     2011-06-23
  */
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
- * Provides TestSuite_Core_Model_Sprig
+ * Provides TestSuite_Core_Model_Jelly
  *
  * PHP version 5
  *
@@ -29,13 +29,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author    mtou <mtou@charougna.com>
  * @copyright 2011 mtou
  * @license   http://www.debian.org/misc/bsd.license BSD License (3 Clause)
- * @link      https://github.com/emtou/kohana-testsuite/tree/master/classes/testsuite/core/model/sprig.php
+ * @link      https://github.com/emtou/kohana-testsuite/tree/master/classes/testsuite/core/model/jelly.php
  */
-abstract class TestSuite_Core_Model_Sprig extends TestSuite_Model
+abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
 {
 
   /**
-   * Base configuration for Sprig models
+   * Base configuration for Jelly models
    *
    * @param string $name      see PHPUnit_Framework_TestCase::__construct()
    * @param array  $data      see PHPUnit_Framework_TestCase::__construct()
@@ -50,4 +50,4 @@ abstract class TestSuite_Core_Model_Sprig extends TestSuite_Model
     $this->_register_public_static_method('initialize');
   }
 
-} // End class TestSuite_Core_Model_Sprig
+} // End class TestSuite_Core_Model_Jelly
