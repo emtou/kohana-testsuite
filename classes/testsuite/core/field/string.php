@@ -45,8 +45,8 @@ abstract class TestSuite_Core_Field_String extends TestSuite_Field
   {
     parent::__construct($alias);
 
-    $this->add(TestSuite_Constraint::factory('length', 1, 256));
-    $this->add(TestSuite_Constraint::factory('required'));
+    $this->add(TestSuite_Constraint::factory('length', 1, 64));
+    $this->add(TestSuite_Constraint::factory('required', FALSE));
     $this->add(TestSuite_Constraint::factory('unique', FALSE));
 
   }
