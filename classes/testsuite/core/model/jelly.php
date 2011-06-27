@@ -91,6 +91,12 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
 
           $value = str_repeat('x', $length_test[0]);
           $this->_object->set($alias, $value);
+
+          // if this field should be unique, set its default value
+          // to the current value to bypass unique rule testing
+          $default_value  = $field->default;
+          $field->default = $value;
+
           try
           {
             $this->_object->check();
@@ -127,6 +133,9 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
           );
 
           $this->_object->set($alias, $this->_object->original($alias));
+
+          // if this field should be unique, reset its default value
+          $field->default = $default_value;
         }
 
       break;
