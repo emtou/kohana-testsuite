@@ -64,6 +64,25 @@ Requires Kohana 3.1.x
         //$this->_register_public_method('_public_method_in_user_model');
         //$this->_register_public_static_method('_public_static_method_in_user_model');
         //$this->_register_static_method('_static_method_in_user_model');
+
+        // Testing fields
+        $this->_register_field(
+          TestSuite_Field::factory('integer', 'id')
+            ->add(TestSuite_Constraint::factory('primary'))
+        );
+
+        $this->_register_field(
+          TestSuite_Field::factory('string', 'code')
+            ->add(TestSuite_Constraint::factory('length', 1, 32))
+            ->add(TestSuite_Constraint::factory('required'))
+            ->add(TestSuite_Constraint::factory('unique'))
+        );
+
+        $this->_register_field(
+          TestSuite_Field::factory('text', 'description')
+            ->add(TestSuite_Constraint::factory('required', FALSE))
+            ->add(TestSuite_Constraint::factory('unique', FALSE))
+        );
       }
     }
     ```
@@ -75,3 +94,4 @@ method initialize().
 # Versions
 
 * 0.1 (2011-06-24): tests controllers' and models' members and their visibility
+* 0.2 (2011-06-27): tests models' fields
