@@ -99,7 +99,7 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
           {
             $errors = $exception->errors();
             if (isset($errors[$alias])
-                and in_array($errors[$alias][0], array('min_length', 'max_length')))
+                and in_array($errors[$alias][0], array('min_length', 'max_length', 'not_empty')))
             {
               $validation_error = FALSE;
             }
@@ -129,6 +129,32 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
           $this->_object->set($alias, $this->_object->original($alias));
         }
 
+      break;
+
+      case 'primary';
+        // Must look into field definition
+        $params = $this->_fields[$alias]->constraint($constraint_type)->params();
+
+        if (sizeof($params) == 0)
+        {
+          $params[] = TRUE;
+        }
+
+        if ($params[0])
+        {
+          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
+                     'model must be a primary key but is not.';
+        }
+        else
+        {
+          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
+                     'model must not be a primary key but is.';
+        }
+
+        $this->assertTrue(
+            $field->primary == $params[0],
+            $message
+        );
       break;
 
       case 'required';
