@@ -113,11 +113,19 @@ abstract class TestSuite_Core_Field
    * @param string $alias alias of the field to create
    *
    * @return TestSuite_Field instanciated field
+   *
+   * @throws TestSuite_Exception Can't create field: Field type «X» does not exist
    */
   public static function factory($type, $alias)
   {
     $class = TestSuite_Field::class_name($type);
 
+    if ( ! class_exists($class))
+    {
+      throw new TestSuite_Exception(
+          'Can\'t create field: Field type «'.$type.'» does not exist'
+      );
+    }
     return new $class($alias);
   }
 
