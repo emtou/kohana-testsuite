@@ -99,7 +99,7 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
 
           try
           {
-            $this->_object->check();
+            $this->_object->check(Jelly_Validation::factory(array($alias)));
           }
           catch (Jelly_Validation_Exception $exception)
           {
@@ -180,7 +180,7 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
         $this->_object->set($alias, $value);
         try
         {
-          $this->_object->check();
+          $this->_object->check(Jelly_Validation::factory(array($alias)));
         }
         catch (Jelly_Validation_Exception $exception)
         {
