@@ -131,6 +131,19 @@ abstract class TestSuite_Core_Field
 
 
   /**
+   * Provides a list of constraint types attached to this field
+   *
+   * @param string $type of the constraint
+   *
+   * @return array list of constraint types
+   */
+  public function has_constraint($type)
+  {
+    return isset($this->_constraints[$type]);
+  }
+
+
+  /**
    * Finds the type of the field from its class name
    *
    * @return string type of the field

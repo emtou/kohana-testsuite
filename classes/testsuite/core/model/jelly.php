@@ -35,217 +35,6 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
 {
 
   /**
-   * Checks a constraint on a field
-   *
-   * This method must be overridden by specific TestSuite_Model.
-   *
-   * @param string $alias           alias of the field
-   * @param string $constraint_type type of the constraint to test
-   *
-   * @return null
-   *
-   * @throws TestSuite_Exception TestSuite_Model::_test_field_constraint($alias, $constraint_type)
-   *                             must be overridden by specific TestSuite_Model.
-   */
-  protected function _test_field_constraint($alias, $constraint_type)
-  {
-    $field = $this->_object->meta()->field($alias);
-    if ($field == NULL)
-      return;
-
-    switch ($constraint_type)
-    {
-      case 'encoding';
-        throw new TestSuite_Exception('Encoding constraint is not developped for now.');
-      break;
-
-      case 'length';
-        $params = $this->_fields[$alias]->constraint($constraint_type)->params();
-
-        if (sizeof($params) != 2)
-        {
-          throw new TestSuite_Exception(
-            'Invalid length constraint on «'.$alias.'» field of «'.$this->_object_name.'» model: '.
-            'expected 2 parameters, found '.sizeof($params).'.'
-          );
-        }
-
-        $length_tests = array();
-        // minimum length
-        $length_tests[] = array($params[0], TRUE);
-        // maximum length
-        $length_tests[] = array($params[1], TRUE);
-        // minimum length + 1
-        $length_tests[] = array($params[1]+1, FALSE);
-        // average length
-        $length_tests[] = array(intval(($params[0]+$params[0])/2), TRUE);
-        // minimum length -1
-        if ($params[0] > 0)
-        {
-          $length_tests[] = array($params[0]-1, FALSE);
-        }
-
-        foreach ($length_tests as $length_test)
-        {
-          $validation_error = TRUE;
-
-          $value = str_repeat('x', $length_test[0]);
-          $this->_object->set($alias, $value);
-
-          // if this field should be unique, set its default value
-          // to the current value to bypass unique rule testing
-          $default_value  = $field->default;
-          $field->default = $value;
-
-          try
-          {
-            $this->_object->check(Jelly_Validation::factory(array($alias)));
-          }
-          catch (Jelly_Validation_Exception $exception)
-          {
-            $errors = $exception->errors();
-            if (isset($errors[$alias])
-                and in_array($errors[$alias][0], array('min_length', 'max_length', 'not_empty')))
-            {
-              $validation_error = FALSE;
-            }
-          }
-
-
-          if ($length_test[1])
-          {
-            $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                       'model must accept input with '.$length_test[0].
-                       ' characters but does not: expected length between '.
-                       $params[0].' and '.$params[1];
-          }
-          else
-          {
-            $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                       'model must not accept input with '.$length_test[0].
-                       ' characters but does: expected length between '.
-                       $params[0].' and '.$params[1];
-          }
-
-          $this->assertTrue(
-              $length_test[1] == $validation_error,
-              $message
-          );
-
-          $this->_object->set($alias, $this->_object->original($alias));
-
-          // if this field should be unique, reset its default value
-          $field->default = $default_value;
-        }
-
-      break;
-
-      case 'primary';
-        // Must look into field definition
-        $params = $this->_fields[$alias]->constraint($constraint_type)->params();
-
-        if (sizeof($params) == 0)
-        {
-          $params[] = TRUE;
-        }
-
-        if ($params[0])
-        {
-          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                     'model must be a primary key but is not.';
-        }
-        else
-        {
-          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                     'model must not be a primary key but is.';
-        }
-
-        $this->assertTrue(
-            $field->primary == $params[0],
-            $message
-        );
-      break;
-
-      case 'required';
-        $params = $this->_fields[$alias]->constraint($constraint_type)->params();
-
-        if (sizeof($params) == 0)
-        {
-          $params[] = TRUE;
-        }
-
-        $validation_error = FALSE;
-
-        $value = '';
-        $this->_object->set($alias, $value);
-        try
-        {
-          $this->_object->check(Jelly_Validation::factory(array($alias)));
-        }
-        catch (Jelly_Validation_Exception $exception)
-        {
-          $errors = $exception->errors();
-          if (isset($errors[$alias])
-              and $errors[$alias][0] == 'not_empty')
-          {
-            $validation_error = TRUE;
-          }
-        }
-
-        if ($params[0])
-        {
-          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                     'model must not accept empty input but does.';
-        }
-        else
-        {
-          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                     'model must accept empty input but does not.';
-        }
-
-        $this->assertTrue(
-              $validation_error == $params[0],
-              $message
-          );
-
-        $this->_object->set($alias, $this->_object->original($alias));
-      break;
-
-      case 'unique';
-        // Must look into field definition
-        $params = $this->_fields[$alias]->constraint($constraint_type)->params();
-
-        if (sizeof($params) == 0)
-        {
-          $params[] = TRUE;
-        }
-
-        if ($params[0])
-        {
-          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                     'model must be unique but is not.';
-        }
-        else
-        {
-          $message = '«'.$alias.'» field of «'.$this->_object_name.'» '.
-                     'model must not be unique but is.';
-        }
-
-        $this->assertTrue(
-            $field->unique == $params[0],
-            $message
-        );
-      break;
-
-      default :
-
-      break;
-    }
-
-  }
-
-
-  /**
    * Checks if a field exists
    *
    * @param string $alias alias of the field
@@ -259,6 +48,236 @@ abstract class TestSuite_Core_Model_Jelly extends TestSuite_Model
         $this->_object->meta()->field($alias),
         'Field «'.$alias.'» does not exist in «'.$this->_object_name.'» model.'
     );
+  }
+
+
+  /**
+   * Checks all given lengths' constraints for the given type and expected result
+   *
+   * @param array  $constraints     list of length constraints (key is field alias)
+   * @param string $check_type      type of length check
+   * @param bool   $expected_result expected assert result while checking length
+   *
+   * @return null
+   *
+   * @throws TestSuite_Exception Invalid length constraint on :modelname:::fieldalias field :
+   *                             expected 2 parameters, found :nbparams
+   */
+  protected function _test_fields_length(array $constraints, $check_type, $expected_result)
+  {
+    $default_values = array();
+
+    foreach ($constraints as $field_alias => $constraint)
+    {
+      if (sizeof($constraint->params()) != 2)
+      {
+        throw new TestSuite_Exception(
+          'Invalid length constraint on :modelname:::fieldalias field : '.
+          'expected 2 parameters, found :nbparams',
+          array(
+            ':modelname'  => $this->_object_name,
+            ':fieldalias' => $field_alias,
+            ':nbparams'   => sizeof($constraint->params())
+          )
+        );
+      }
+
+      $length = $constraint->get_length($check_type);
+      if ($length < 0)
+        continue;
+
+      $value = str_repeat('x', $length);
+      $this->_object->set($field_alias, $value);
+
+      // if this field should be unique, set its default value
+      // to the current value to bypass unique rule testing
+      $default_values[$field_alias] = $this->_object->meta()->field($field_alias)->default;
+
+      $this->_object->meta()->field($field_alias)->default = $value;
+    }
+
+    try
+    {
+      $this->_object->check(Jelly_Validation::factory(array_keys($constraints)));
+    }
+    catch (Jelly_Validation_Exception $exception)
+    {
+      $errors = $exception->errors();
+
+      foreach ($constraints as $field_alias => $constraint)
+      {
+        $validation_error = TRUE;
+
+        if (isset($errors[$field_alias])
+          and in_array($errors[$field_alias][0], array('min_length', 'max_length', 'not_empty')))
+        {
+          $validation_error = FALSE;
+        }
+
+        $params  = $constraint->params();
+        $message = $this->_object_name.'::'.$field_alias.' field ';
+        if ($expected_result)
+        {
+          $message .= 'must accept input with '.$constraint->get_length($check_type).
+                      ' characters but does not: expected length between '.
+                      $params[0].' and '.$params[1];
+        }
+        else
+        {
+          $message .= 'must not accept input with '.$constraint->get_length($check_type).
+                      ' characters but does: expected length between '.
+                      $params[0].' and '.$params[1];
+        }
+
+        if ($constraint->get_length($check_type) > 0)
+        {
+          $this->assertTrue($expected_result == $validation_error, $message);
+        }
+      }
+    }
+
+    foreach ($constraints as $field_alias => $constraint)
+    {
+      $this->_object->set($field_alias, $this->_object->original($field_alias));
+
+      // if this field should be unique, reset its default value
+      if (isset($default_values[$field_alias]))
+      {
+        $this->_object->meta()->field($field_alias)->default = $default_values[$field_alias];
+      }
+    }
+  }
+
+
+  /**
+   * Checks all given primary constraints
+   *
+   * @param array $constraints list of primary constraints (key is field alias)
+   *
+   * @return null
+   */
+  protected function _test_fields_primary(array $constraints)
+  {
+    foreach ($constraints as $field_alias => $constraint)
+    {
+      $params = $constraint->params();
+
+      if (sizeof($params) == 0)
+      {
+        $params[] = TRUE;
+      }
+
+      $message = $this->_object_name.'::'.$field_alias.' field ';
+      if ($params[0])
+      {
+        $message .= 'must be a primary key but is not.';
+      }
+      else
+      {
+        $message .= 'must not be a primary key but is.';
+      }
+
+      $this->assertTrue($this->_object->meta()->field($field_alias)->primary == $params[0], $message);
+    }
+  }
+
+
+  /**
+   * Checks all given required constraints
+   *
+   * @param array $constraints list of required constraints (key is field alias)
+   *
+   * @return null
+   */
+  protected function _test_fields_required(array $constraints)
+  {
+    foreach ($constraints as $field_alias => $constraint)
+    {
+      $params = $constraint->params();
+
+      if (sizeof($params) == 0)
+      {
+        $params[] = TRUE;
+      }
+
+      $value = '';
+      $this->_object->set($field_alias, $value);
+    }
+
+    try
+    {
+      $this->_object->check(Jelly_Validation::factory(array_keys($constraints)));
+    }
+    catch (Jelly_Validation_Exception $exception)
+    {
+      $errors = $exception->errors();
+
+      foreach ($constraints as $field_alias => $constraint)
+      {
+        $validation_error = FALSE;
+
+        if (isset($errors[$field_alias])
+          and $errors[$field_alias][0] == 'not_empty')
+        {
+          $validation_error = TRUE;
+        }
+
+        $params = $constraint->params();
+        if (sizeof($params) == 0)
+        {
+          $params[] = TRUE;
+        }
+        $message = $this->_object_name.'::'.$field_alias.' field ';
+        if ($params[0])
+        {
+          $message .= 'must not accept empty input but does.';
+        }
+        else
+        {
+          $message .= 'must accept empty input but does not.';
+        }
+
+        $this->assertTrue($validation_error == $params[0], $message);
+      }
+    }
+
+    foreach ($constraints as $field_alias => $constraint)
+    {
+      $this->_object->set($field_alias, $this->_object->original($field_alias));
+    }
+  }
+
+
+  /**
+   * Checks all given unique constraints
+   *
+   * @param array $constraints list of unique constraints (key is field alias)
+   *
+   * @return null
+   */
+  protected function _test_fields_unique(array $constraints)
+  {
+    foreach ($constraints as $field_alias => $constraint)
+    {
+      $params = $constraint->params();
+
+      if (sizeof($params) == 0)
+      {
+        $params[] = TRUE;
+      }
+
+      $message = $this->_object_name.'::'.$field_alias.' field ';
+      if ($params[0])
+      {
+        $message .= 'must be a unique but is not.';
+      }
+      else
+      {
+        $message .= 'model must not be unique but is.';
+      }
+
+      $this->assertTrue($this->_object->meta()->field($field_alias)->unique == $params[0], $message);
+    }
   }
 
 
