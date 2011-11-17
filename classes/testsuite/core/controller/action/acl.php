@@ -130,6 +130,7 @@ abstract class TestSuite_Core_Controller_Action_ACL extends Kohana_Unittest_Test
 
       $controller->before();
       $controller->{'action_'.$this->_action_name}();
+      $controller->after();
     }
     catch (Exception $exception)
     {
