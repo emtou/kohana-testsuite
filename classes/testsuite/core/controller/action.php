@@ -33,11 +33,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 abstract class TestSuite_Core_Controller_Action extends Kohana_Unittest_TestCase
 {
+  const URI_NOT_SET = 'URI_NOT_SET';
+
   protected $_action_name     = '';
   protected $_controller      = NULL;
   protected $_controller_name = '';
   protected $_response        = NULL;
-
+  protected $_uri             = TestSuite_Controller_Action::URI_NOT_SET;
 
 
   /**
@@ -79,6 +81,11 @@ abstract class TestSuite_Core_Controller_Action extends Kohana_Unittest_TestCase
    */
   protected function _init_controller()
   {
+    if ($this->_uri == TestSuite_Controller_Action::URI_NOT_SET)
+    {
+      throw new TestSuite_Exception('Can\'t instanciate request: URI not set');
+    }
+
     $controller_class_name = 'Controller_'.$this->_controller_name;
 
     if ( ! class_exists($controller_class_name))
@@ -89,8 +96,8 @@ abstract class TestSuite_Core_Controller_Action extends Kohana_Unittest_TestCase
       );
     }
 
-    $this->_response   = new Response(array());
-    $this->_controller = new $controller_class_name(new Request(''), $this->_response);
+    $this->_response   = new Response;
+    $this->_controller = new $controller_class_name(new Request($this->_uri), $this->_response);
   }
 
 } // end class TestSuite_Core_Controller_Action
