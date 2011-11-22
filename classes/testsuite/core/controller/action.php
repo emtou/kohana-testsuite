@@ -45,11 +45,17 @@ abstract class TestSuite_Core_Controller_Action extends Kohana_Unittest_TestCase
   /**
    * Call controller's action
    *
+   * The list of options keys can contain :
+   *   - 'posts'  (array)  : key value pairs to feed a HTTP POST request
+   *   - 'method' (string) : HTTP method of the request
+   *
+   * @param array $options optional list of key value pairs of options
+   *
    * @return bool action called ?
    */
-  protected function _call_action()
+  protected function _call_action(array $options = array())
   {
-    $this->_init_controller();
+    $this->_init_controller($options);
 
     if (method_exists($this->_controller, $this->_action_name))
     {
@@ -75,11 +81,17 @@ abstract class TestSuite_Core_Controller_Action extends Kohana_Unittest_TestCase
   /**
    * Instanciate the controller
    *
+   * See TestSuite_Core_Controller_Action::_call_action for a description of the options parameter.
+   *
+   * @param array $options optional list of key value pairs of options
+   *
    * @return null
    *
    * @throw TestSuite_Exception Controller :controllerclass does not exist
+   *
+   * @see TestSuite_Core_Controller_Action::_call_action()
    */
-  protected function _init_controller()
+  protected function _init_controller(array $options = array())
   {
     if ($this->_uri == TestSuite_Controller_Action::URI_NOT_SET)
     {
@@ -96,8 +108,19 @@ abstract class TestSuite_Core_Controller_Action extends Kohana_Unittest_TestCase
       );
     }
 
+    $request = new Request($this->_uri);
+
+    if (array_key_exists('method', $options))
+    {
+      $request->method($options['method']);
+    }
+    if (array_key_exists('posts', $options))
+    {
+      $request->post($options['posts']);
+    }
+
     $this->_response   = new Response;
-    $this->_controller = new $controller_class_name(new Request($this->_uri), $this->_response);
+    $this->_controller = new $controller_class_name($request, $this->_response);
   }
 
 } // end class TestSuite_Core_Controller_Action
