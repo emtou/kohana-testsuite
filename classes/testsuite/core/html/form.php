@@ -600,7 +600,7 @@ abstract class TestSuite_Core_HTML_Form
   {
     try
     {
-      $this->_field[$name]['options'][$key] = $value;
+      $this->_fields[$name]['options'][$key] = $value;
     }
     catch (Exception $exception)
     {
