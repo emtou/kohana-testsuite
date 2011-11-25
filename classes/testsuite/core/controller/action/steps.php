@@ -31,8 +31,7 @@ defined('SYSPATH') or die('No direct access allowed!');
 abstract class TestSuite_Core_Controller_Action_Steps extends TestSuite_Controller_Action
 {
   static $completed_steps = array('step-1');
-
-  protected $_steps = array();
+  static $steps           = array();
 
 
   /**
@@ -109,7 +108,7 @@ abstract class TestSuite_Core_Controller_Action_Steps extends TestSuite_Controll
   {
     $array = array();
 
-    for ($nb=0; $nb < count($this->_steps); ++$nb)
+    for ($nb=0; $nb < count(self::$steps); ++$nb)
     {
       $array[] = array($nb);
     }
@@ -136,8 +135,12 @@ abstract class TestSuite_Core_Controller_Action_Steps extends TestSuite_Controll
     if ( ! in_array('step'.$step_nb, self::$completed_steps)
          and in_array('step'.( (string) ($step_nb-1)), self::$completed_steps))
     {
-      $this->_test_step($step_nb, $this->_steps[$step_nb]);
+      $this->_test_step($step_nb, self::$steps[$step_nb]);
       self::$completed_steps[] = 'step'.$step_nb;
+    }
+    else
+    {
+      $this->markTestSkipped();
     }
   }
 
