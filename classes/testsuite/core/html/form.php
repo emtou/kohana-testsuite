@@ -110,7 +110,7 @@ abstract class TestSuite_Core_HTML_Form
         $this->_testcase->assertEquals(
             $value,
             $current_value,
-            $message.': options do not match expectation'
+            $message.': value does not match expectation'
         );
       break;
 
@@ -119,7 +119,7 @@ abstract class TestSuite_Core_HTML_Form
         $this->_testcase->assertEquals(
             $value,
             $options,
-            $message.': options do not match expectation'
+            $message.': values do not match expectation'
         );
       break;
 
@@ -616,16 +616,23 @@ abstract class TestSuite_Core_HTML_Form
   /**
    * Perform every test on configured fields
    *
+   * @param string $message optional fail message
+   *
    * @return null
    */
-  public function test()
+  public function test($message = '')
   {
+    if ( ! empty($message))
+    {
+      $message .= ': ';
+    }
+
     foreach ($this->_fields as $name => $definition)
     {
-      $message = 'Error on '.$name.' field';
+      $field_message = $message.'Error on '.$name.' field';
       if (array_key_exists('message', $definition))
       {
-        $message = $definition['message'];
+        $field_message = $message.$definition['message'];
       }
 
       $options = array();
@@ -636,10 +643,10 @@ abstract class TestSuite_Core_HTML_Form
 
       $this->_testcase->assertTrue(
           array_key_exists('type', $definition),
-          $message.': no field type founc in definition'
+          $field_message.': no field type found in definition'
       );
 
-      $this->_test_field($definition['type'], $name, $options, $message);
+      $this->_test_field($definition['type'], $name, $options, $field_message);
     }
   }
 
