@@ -36,6 +36,7 @@ abstract class TestSuite_Core_HTML_Form
   const INPUT_SUBMIT = 'INPUT_SUBMIT';
   const INPUT_TEXT   = 'INPUT_TEXT';
   const SELECT       = 'SELECT';
+  const TEXTAREA     = 'TEXTAREA';
 
 
   protected $_attributes = array(); /** list of key value attribute pairs */
@@ -255,6 +256,9 @@ abstract class TestSuite_Core_HTML_Form
    */
   protected function _get_field_value(DOMElement $field)
   {
+    if ($field->tagName == 'textarea')
+      return utf8_decode(trim($field->nodeValue));
+
     return utf8_decode(trim($field->getAttribute('value')));
   }
 
@@ -419,6 +423,10 @@ abstract class TestSuite_Core_HTML_Form
         $this->assert_select($name, $options, $message);
       break;
 
+      case self::TEXTAREA:
+        $this->assert_textarea($name, $options, $message);
+      break;
+
       default:
         $this->_testcase->fail($message.': unknown '.$type.' field type');
     }
@@ -577,6 +585,38 @@ abstract class TestSuite_Core_HTML_Form
     }
 
     $field = $this->_get_field('select', $name, $message);
+
+    foreach ($options as $key => $value)
+    {
+      $this->_assert_field_option($field, $key, $value, $message);
+    }
+  }
+
+
+  /**
+   * Asserts the form contains a given TEXTAREA field
+   *
+   * List of possible options :
+   *   - label    (string)      : exact label found for the field
+   *   - value    (string)      : field's value
+   *   - visible  (bool)        : is this field visible ?
+   *
+   * @param string $name    name of the textarea field
+   * @param array  $options optional key value pairs of options
+   * @param string $message optional fail message
+   *
+   * @return null
+   */
+  public function assert_textarea($name, array $options = array(), $message = NULL)
+  {
+    $this->assert_exists();
+
+    if (is_null($message))
+    {
+      $message = 'Error on '.$name.' textarea field';
+    }
+
+    $field = $this->_get_field('textarea', $name, $message);
 
     foreach ($options as $key => $value)
     {
