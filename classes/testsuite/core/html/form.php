@@ -259,7 +259,7 @@ abstract class TestSuite_Core_HTML_Form
     if ($field->tagName == 'textarea')
       return utf8_decode(trim($field->nodeValue));
 
-    return utf8_decode(trim($field->getAttribute('value')));
+    return trim($field->getAttribute('value'));
   }
 
 
